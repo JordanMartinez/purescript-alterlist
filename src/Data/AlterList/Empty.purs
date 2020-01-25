@@ -24,6 +24,9 @@ data AlterList second first
   = Nil
   | Cons first (AlterList first second)
 
+instance functorAlterList :: Functor (AlterList b) where
+  map = bimap identity
+
 instance bifunctorAlterList :: Bifunctor AlterList where
   bimap g f = case _ of
     Nil -> Nil

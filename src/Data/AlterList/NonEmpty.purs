@@ -26,6 +26,9 @@ data NonEmptyAlterList second first
   = One first
   | Alter first (NonEmptyAlterList first second)
 
+instance functorNonEmptyAlterList :: Functor (NonEmptyAlterList b) where
+  map = bimap identity
+
 instance bifunctorNonEmptyAlterList :: Bifunctor NonEmptyAlterList where
   bimap g f = case _ of
     One a -> One (f a)
