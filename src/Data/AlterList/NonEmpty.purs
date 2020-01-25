@@ -92,9 +92,19 @@ splitList :: forall a b. NonEmptyAlterList b a -> Tuple (List a) (List b)
 splitList list =
   bifoldl (\tuple b -> rmap (Cons b) tuple) (\tuple a -> lmap (Cons a) tuple) (Tuple Nil Nil) list
 
+-- | Only returns a `NonEmptyAlterList` if both Lists' size are equal
 zipList :: forall a b. List a -> List b -> Maybe (NonEmptyAlterList b a)
 zipList Nil _ = Nothing
 zipList _ Nil = Nothing
 zipList (Cons h1 tail1) (Cons h2 tail2) = ado
       rest <- zipList tail1 tail2
       in Alter h1 (Alter h2 rest)
+
+-- | Same as `zipList` but will return a `NonEmptyAlterList` as long as
+-- | the first list has an element.
+zipList' :: forall a b. List a -> List b -> Maybe (NonEmptyAlterList b a)
+zipList' Nil _ = Nothing
+zipList' (Cons h1 _) Nil = Just (One h1)
+zipList' (Cons h1 tail1) (Cons h2 tail2) = ado
+  rest <- zipList' tail1 tail2
+  in Alter h1 (Alter h2 rest)

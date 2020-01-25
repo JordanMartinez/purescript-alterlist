@@ -90,8 +90,18 @@ splitList :: forall a b. AlterList b a -> Tuple (List.List a) (List.List b)
 splitList list =
   bifoldl (\tuple b -> rmap (List.Cons b) tuple) (\tuple a -> lmap (List.Cons a) tuple) (Tuple List.Nil List.Nil) list
 
+-- | Returns an `AlterList` that only has as many elements as the shortest
+-- | list in the arguments.
 zipList :: forall a b. List.List a -> List.List b -> AlterList b a
 zipList List.Nil _ = Nil
 zipList _ List.Nil = Nil
 zipList (List.Cons h1 tail1) (List.Cons h2 tail2) =
+  Cons h1 (Cons h2 (zipList tail1 tail2))
+
+-- | Same as `zipList'` but will include another element from `List a`
+-- | if possible.
+zipList' :: forall a b. List.List a -> List.List b -> AlterList b a
+zipList' List.Nil _ = Nil
+zipList' (List.Cons h1 _) List.Nil = Cons h1 Nil
+zipList' (List.Cons h1 tail1) (List.Cons h2 tail2) =
   Cons h1 (Cons h2 (zipList tail1 tail2))
