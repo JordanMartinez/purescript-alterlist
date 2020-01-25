@@ -56,6 +56,10 @@ instance bitraversableAlterListTree :: Bitraversable AlterListTree where
 
   bisequence x = bisequenceDefault x
 
+-- | Creates a list with only one element
+singleton :: forall a b. a -> AlterListTree b a
+singleton = Leaf
+
 -- | Adds the next two elements to the front of the list
 cons :: forall a b. a -> b -> AlterListTree b a -> AlterListTree b a
 cons newA newB = case _ of
