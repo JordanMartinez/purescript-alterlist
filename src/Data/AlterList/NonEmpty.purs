@@ -21,8 +21,6 @@ import Data.Tuple (Tuple(..))
 -- | (Alter 1 (Alter "more" (One   2)))
 -- | (Alter 1 (Alter "more" (Alter 2 (One "see"))))
 -- | ```
--- |
--- | `NonEmptyAlterList b a` is isomorphic to `Tuple (List a) (List b)`
 data NonEmptyAlterList second first
   = One first
   | Alter first (NonEmptyAlterList first second)
