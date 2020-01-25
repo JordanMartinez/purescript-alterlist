@@ -78,7 +78,7 @@ snoc newB newA = case _ of
     Branch b1 treeA b2 ->
       Branch a1 (Branch b1 (snoc b2 a2 treeA) newB) newA
 
--- | Closest we can get to "treeA1 <|> treeB <|> treeA2"
+-- | Closest we can get to "treeA1 <> treeB <> treeA2"
 interjectTree :: forall a b. AlterListTree b a -> AlterListTree a b -> AlterListTree b a -> AlterListTree b a
 interjectTree left middle right = case left, right of
   Leaf a1, Leaf a2 -> Branch a1 middle a2
