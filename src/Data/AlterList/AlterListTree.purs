@@ -5,6 +5,7 @@ import Prelude
 import Data.Bifoldable (class Bifoldable, bifoldMap, bifoldl, bifoldr)
 import Data.Bifunctor (class Bifunctor, bimap, lmap, rmap)
 import Data.Bitraversable (class Bitraversable, bisequenceDefault, bitraverse)
+import Data.Either (Either(..))
 import Data.List (List(..))
 import Data.Tuple (Tuple(..))
 
@@ -100,6 +101,22 @@ concat (Leaf a1) (Branch a2 treeB a3) = Branch (a1 <> a2) treeB a3
 concat (Branch a1 treeB a2) (Leaf a3) = Branch a1 treeB (a2 <> a3)
 concat (Branch a1 treeB1 a2) (Branch a3 treeB2 a4) =
   Branch a1 (interjectVal treeB1 (a2 <> a3) treeB2) a4
+
+-- | Uncons the outer `a` and inner `b` on the front of the list
+unconsLeft :: forall a b. AlterListTree b a -> Either a { outer :: a, inner :: b, list :: AlterListTree b a }
+unconsLeft = case _ of
+  Leaf a -> Left a
+  Branch a1 treeB a2 -> case treeB of
+    Leaf b -> Right { outer: a1, inner: b, list: Leaf a2 }
+    Branch b1 treeA b2 -> Right { outer: a1, inner: b1, list: snoc b2 a2 treeA }
+
+-- | Uncons the outer `a` and inner `b` on the end of the list
+unconsRight :: forall a b. AlterListTree b a -> Either a { outer :: a, inner :: b, list :: AlterListTree b a }
+unconsRight = case _ of
+  Leaf a -> Left a
+  Branch a1 treeB a2 -> case treeB of
+    Leaf b -> Right { outer: a2, inner: b, list: Leaf a1 }
+    Branch b1 treeA b2 -> Right { outer: a2, inner: b2, list: cons a1 b1 treeA }
 
 splitList :: forall a b. AlterListTree b a -> Tuple (List a) (List b)
 splitList =
