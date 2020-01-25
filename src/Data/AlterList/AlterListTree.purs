@@ -123,6 +123,8 @@ unconsRight = case _ of
     Leaf b -> Right { outer: a2, inner: b, list: Leaf a1 }
     Branch b1 treeA b2 -> Right { outer: a2, inner: b2, list: cons a1 b1 treeA }
 
+-- | Splits the AlterListTree into a list of `a`s and `b`s. The `a` list
+-- | will always have one more element than the `b` list.
 splitList :: forall a b. AlterListTree b a -> Tuple (List a) (List b)
 splitList =
   bifoldl (\tuple b -> rmap (Cons b) tuple) (\tuple a -> lmap (Cons a) tuple) (Tuple Nil Nil)
