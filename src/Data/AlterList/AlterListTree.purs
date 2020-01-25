@@ -23,13 +23,6 @@ data AlterListTree inner outer
   = Leaf outer
   | Branch outer (AlterListTree outer inner) outer
 
-concat :: forall a b. Semigroup a => Semigroup b => AlterListTree b a -> AlterListTree b a -> AlterListTree b a
-concat (Leaf a1) (Leaf a2) = Leaf (a1 <> a2)
-concat (Leaf a1) (Branch a2 treeB a3) = Branch (a1 <> a2) treeB a3
-concat (Branch a1 treeB a2) (Leaf a3) = Branch a1 treeB (a2 <> a3)
-concat (Branch a1 treeB1 a2) (Branch a3 treeB2 a4) =
-  Branch a1 (interjectVal treeB1 (a2 <> a3) treeB2) a4
-
 instance functorAlterListTree :: Functor (AlterListTree b) where
   map = bimap identity
 
@@ -99,6 +92,13 @@ interjectVal left newB right = case left, right of
   Branch a1 treeB a2, Leaf a3 -> Branch a1 (snoc a2 newB treeB) a3
   Branch a1 treeB1 a2, Branch a3 treeB2 a4 ->
     Branch a1 (interjectTree treeB1 (Branch a2 (Leaf newB) a3) treeB2) a4
+
+concat :: forall a b. Semigroup a => Semigroup b => AlterListTree b a -> AlterListTree b a -> AlterListTree b a
+concat (Leaf a1) (Leaf a2) = Leaf (a1 <> a2)
+concat (Leaf a1) (Branch a2 treeB a3) = Branch (a1 <> a2) treeB a3
+concat (Branch a1 treeB a2) (Leaf a3) = Branch a1 treeB (a2 <> a3)
+concat (Branch a1 treeB1 a2) (Branch a3 treeB2 a4) =
+  Branch a1 (interjectVal treeB1 (a2 <> a3) treeB2) a4
 
 splitList :: forall a b. AlterListTree b a -> Tuple (List a) (List b)
 splitList =
