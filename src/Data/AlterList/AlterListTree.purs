@@ -93,6 +93,7 @@ interjectVal left newB right = case left, right of
   Branch a1 treeB1 a2, Branch a3 treeB2 a4 ->
     Branch a1 (interjectTree treeB1 (Branch a2 (Leaf newB) a3) treeB2) a4
 
+-- | Closest we can get to "treeA1 <|> treeA2"
 concat :: forall a b. Semigroup a => Semigroup b => AlterListTree b a -> AlterListTree b a -> AlterListTree b a
 concat (Leaf a1) (Leaf a2) = Leaf (a1 <> a2)
 concat (Leaf a1) (Branch a2 treeB a3) = Branch (a1 <> a2) treeB a3
