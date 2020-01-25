@@ -1,2 +1,5 @@
 # purescript-alterlist
-A non-empty linked list whose values' types alternate with each element.
+
+A linked list (empty and non-empty variants) whose values' types alternate with each element.
+
+Credit goes to @monoidmusician for the idea.
