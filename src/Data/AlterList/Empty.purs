@@ -13,53 +13,53 @@ import Data.Tuple (Tuple(..))
 -- |
 -- | For example...
 -- | ```
--- | -- AlterList Int String
+-- | -- AlterList String Int
 -- |
 -- |  Cons 1  Nil
 -- | (Cons 1 (Cons "more"  Nil))
 -- | (Cons 1 (Cons "more" (Cons 2  Nil)))
 -- | (Cons 1 (Cons "more" (Cons 2 (Cons "see" Nil))))
 -- | ```
-data AlterList a b
+data AlterList second first
   = Nil
-  | Cons a (AlterList b a)
+  | Cons first (AlterList first second)
 
 instance bifunctorAlterList :: Bifunctor AlterList where
-  bimap f g = case _ of
+  bimap g f = case _ of
     Nil -> Nil
-    Cons a list -> Cons (f a) (bimap g f list)
+    Cons a list -> Cons (f a) (bimap f g list)
 
 instance bifoldableAlterList :: Bifoldable AlterList where
-  bifoldl f g initial = case _ of
+  bifoldl g f initial = case _ of
     Nil -> initial
-    Cons a list -> bifoldl g f (f initial a) list
+    Cons a list -> bifoldl f g (f initial a) list
 
-  bifoldr f g last = case _ of
+  bifoldr g f last = case _ of
     Nil -> last
-    Cons a list -> f a (bifoldr g f last list)
+    Cons a list -> f a (bifoldr f g last list)
 
-  bifoldMap f g = case _ of
+  bifoldMap g f = case _ of
     Nil -> mempty
-    Cons a list -> (f a) <> bifoldMap g f list
+    Cons a list -> (f a) <> bifoldMap f g list
 
 instance bitraversableAlterList :: Bitraversable AlterList where
-  bitraverse f g = case _ of
+  bitraverse g f = case _ of
     Nil -> pure Nil
     Cons a list -> ado
       b <- f a
-      list' <- bitraverse g f list
+      list' <- bitraverse f g list
       in Cons b list'
 
   bisequence x = bisequenceDefault x
 
 -- | Adds an element to the front of the list.
-cons :: forall a b. b -> AlterList a b -> AlterList b a
+cons :: forall a b. b -> AlterList b a -> AlterList a b
 cons b list = Cons b list
 
 -- | Adds an element to the end of the list. Since we don't know whether
 -- | the list will end with an `a` type (invalid `snoc`) or a `b` type
 -- | (valid `snoc`), the list is wrapped in a `Maybe`
-snoc :: forall a b. a -> AlterList a b -> Maybe (AlterList a b)
+snoc :: forall a b. a -> AlterList b a -> Maybe (AlterList b a)
 snoc newA = case _ of
   Nil -> Nothing
   Cons originalA listB -> case listB of
@@ -70,7 +70,7 @@ snoc newA = case _ of
 
 -- | Adds an element to the end of the list. If the list ends with
 -- | a value of the same type as `a`, the `defaultB` value is used instead.
-snocDefault :: forall a b. a -> b -> AlterList a b -> AlterList a b
+snocDefault :: forall a b. a -> b -> AlterList b a -> AlterList b a
 snocDefault newA defaultB = case _ of
   Nil -> Cons newA Nil
   Cons originalA listB -> case listB of
@@ -83,11 +83,11 @@ snoc' a = case _ of
   Nil -> Cons a Nil
   Cons a' listA -> Cons a' (snoc' a listA)
 
-splitList :: forall a b. AlterList a b -> Tuple (List.List a) (List.List b)
+splitList :: forall a b. AlterList b a -> Tuple (List.List a) (List.List b)
 splitList list =
-  bifoldl (\tuple a -> lmap (List.Cons a) tuple) (\tuple b -> rmap (List.Cons b) tuple) (Tuple List.Nil List.Nil) list
+  bifoldl (\tuple b -> rmap (List.Cons b) tuple) (\tuple a -> lmap (List.Cons a) tuple) (Tuple List.Nil List.Nil) list
 
-zipList :: forall a b. List.List a -> List.List b -> AlterList a b
+zipList :: forall a b. List.List a -> List.List b -> AlterList b a
 zipList List.Nil _ = Nil
 zipList _ List.Nil = Nil
 zipList (List.Cons h1 tail1) (List.Cons h2 tail2) =
