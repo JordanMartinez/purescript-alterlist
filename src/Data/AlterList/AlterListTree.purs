@@ -83,15 +83,15 @@ interjectTree :: forall a b. AlterListTree b a -> AlterListTree a b -> AlterList
 interjectTree left middle right = case left, right of
   Leaf a1, Leaf a2 -> Branch a1 middle a2
   Leaf a1, Branch a2 treeB2 a3 ->
-    Branch a1 (interjectVal middle a2 treeB2) a3
+    Branch a1 (interjectValue middle a2 treeB2) a3
   Branch a1 treeB1 a2, Leaf a3 ->
-    Branch a1 (interjectVal treeB1 a2 middle) a3
+    Branch a1 (interjectValue treeB1 a2 middle) a3
   Branch a1 treeB1 a2, Branch a3 treeB3 a4 ->
     Branch a1 (interjectTree treeB1 (Branch a2 middle a3) treeB3) a4
 
 -- | Closest we can get to "treeA1 `snoc` b `cons` treeA2"
-interjectVal :: forall a b. AlterListTree b a -> b -> AlterListTree b a -> AlterListTree b a
-interjectVal left newB right = case left, right of
+interjectValue :: forall a b. AlterListTree b a -> b -> AlterListTree b a -> AlterListTree b a
+interjectValue left newB right = case left, right of
   Leaf a1, Leaf a2 -> Branch a1 (Leaf newB) a2
   Leaf a1, Branch a2 treeB a3 -> Branch a1 (cons newB a2 treeB) a3
   Branch a1 treeB a2, Leaf a3 -> Branch a1 (snoc a2 newB treeB) a3
@@ -104,7 +104,7 @@ concat (Leaf a1) (Leaf a2) = Leaf (a1 <> a2)
 concat (Leaf a1) (Branch a2 treeB a3) = Branch (a1 <> a2) treeB a3
 concat (Branch a1 treeB a2) (Leaf a3) = Branch a1 treeB (a2 <> a3)
 concat (Branch a1 treeB1 a2) (Branch a3 treeB2 a4) =
-  Branch a1 (interjectVal treeB1 (a2 <> a3) treeB2) a4
+  Branch a1 (interjectValue treeB1 (a2 <> a3) treeB2) a4
 
 -- | Uncons the outer `a` and inner `b` on the front of the list
 unconsLeft :: forall a b. AlterListTree b a -> Either a { outer :: a, inner :: b, list :: AlterListTree b a }
