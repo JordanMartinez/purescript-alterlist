@@ -6,7 +6,8 @@ import Data.Bifoldable (class Bifoldable, bifoldMap, bifoldl, bifoldr)
 import Data.Bifunctor (class Bifunctor, bimap, lmap, rmap)
 import Data.Bitraversable (class Bitraversable, bisequenceDefault, bitraverse)
 import Data.Either (Either(..))
-import Data.List (List(..))
+import Data.List (List(..), foldl)
+import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
 
 -- | A non-empty list where the values' types alternate. Values are stored
@@ -125,3 +126,15 @@ unconsRight = case _ of
 splitList :: forall a b. AlterListTree b a -> Tuple (List a) (List b)
 splitList =
   bifoldl (\tuple b -> rmap (Cons b) tuple) (\tuple a -> lmap (Cons a) tuple) (Tuple Nil Nil)
+
+-- | Similar to `intercalate`. The output is the reversed input list
+-- | whose `b` value is the result of applying all values in the input list
+-- | except for its first element.
+-- |
+-- | `mapAlter show (1 : 2 : Nil)`
+-- | produces
+-- | `Branch 2 (Leaf "2") 1`
+mapAlter :: forall a b. (a -> b) -> List a -> Maybe (AlterListTree b a)
+mapAlter f = case _ of
+  Nil -> Nothing
+  Cons h tail -> Just (foldl (\tree a -> cons a (f a) tree) (Leaf h) tail)
