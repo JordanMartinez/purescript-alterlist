@@ -1,4 +1,4 @@
-module Data.AlterList.NNilmpty where
+module Data.AlterList.Empty where
 
 import Prelude
 
