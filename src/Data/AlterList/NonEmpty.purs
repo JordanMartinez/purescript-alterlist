@@ -9,7 +9,8 @@ import Data.List (List(..))
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
 
--- | A non-empty list where the values' types alternate.
+-- | A non-empty list where the values' types alternate and we do not know
+-- | what the final value's type will be.
 -- |
 -- | For example...
 -- | ```
