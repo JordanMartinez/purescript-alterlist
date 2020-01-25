@@ -133,9 +133,9 @@ splitList =
 -- | whose `b` value is the result of applying all values in the input list
 -- | except for its first element.
 -- |
--- | `mapAlter show (1 : 2 : Nil)`
+-- | `mapAlter show (1 : 2 : 3 : Nil)`
 -- | produces
--- | `Branch 2 (Leaf "2") 1`
+-- | `Branch 3 (Branch "3" (Leaf 2) "2") 1`
 mapAlter :: forall a b. (a -> b) -> List a -> Maybe (AlterListTree b a)
 mapAlter f = case _ of
   Nil -> Nothing
