@@ -9,10 +9,9 @@ import Data.List (List(..), foldl)
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
 
--- | A non-empty list where the values' types alternate. Values are stored
--- | as a two-elements-per-node linked-list for `O(1)` access to the head.
--- | Moreover, the first element and last element in the list have the same
--- | type.
+-- | A non-empty list where the values' types alternate and the first and
+-- | last values' types will be the same. Values are stored as a
+-- | two-elements-per-node linked-list for `O(1)` access to the head.
 -- |
 -- | For example...
 -- | ```

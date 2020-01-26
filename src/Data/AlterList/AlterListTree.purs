@@ -10,8 +10,9 @@ import Data.List (List(..), foldl)
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
 
--- | A non-empty list where the values' types alternate. Values are stored
--- | as an inverted tree for `O(1)` access to the head and tail.
+-- | A non-empty list where the values' types alternate and the first and
+-- | last values' types will be the same. Values are stored as an inverted
+-- | tree for `O(1)` access to the head and tail.
 -- |
 -- | For example...
 -- | ```
