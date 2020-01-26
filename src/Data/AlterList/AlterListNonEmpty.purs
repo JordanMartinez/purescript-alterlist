@@ -1,4 +1,4 @@
-module Data.AlterList.NonEmpty where
+module Data.AlterList.AlterListNonEmpty where
 
 import Prelude
 
@@ -14,26 +14,26 @@ import Data.Tuple (Tuple(..))
 -- |
 -- | For example...
 -- | ```
--- | -- NonEmptyAlterList String Int
+-- | -- AlterListNonEmpty String Int
 -- |
 -- |    One 1
 -- | (Alter 1 (One   "more"))
 -- | (Alter 1 (Alter "more" (One   2)))
 -- | (Alter 1 (Alter "more" (Alter 2 (One "see"))))
 -- | ```
-data NonEmptyAlterList second first
+data AlterListNonEmpty second first
   = One first
-  | Alter first (NonEmptyAlterList first second)
+  | Alter first (AlterListNonEmpty first second)
 
-instance functorNonEmptyAlterList :: Functor (NonEmptyAlterList b) where
+instance functorAlterListNonEmpty :: Functor (AlterListNonEmpty b) where
   map = bimap identity
 
-instance bifunctorNonEmptyAlterList :: Bifunctor NonEmptyAlterList where
+instance bifunctorAlterListNonEmpty :: Bifunctor AlterListNonEmpty where
   bimap g f = case _ of
     One a -> One (f a)
     Alter a list -> Alter (f a) (bimap f g list)
 
-instance bifoldableNonEmptyAlterList :: Bifoldable NonEmptyAlterList where
+instance bifoldableAlterListNonEmpty :: Bifoldable AlterListNonEmpty where
   bifoldl g f initial = case _ of
     One a -> f initial a
     Alter a list -> bifoldl f g (f initial a) list
@@ -46,7 +46,7 @@ instance bifoldableNonEmptyAlterList :: Bifoldable NonEmptyAlterList where
     One a -> f a
     Alter a list -> (f a) <> bifoldMap f g list
 
-instance bitraversableNonEmptyAlterList :: Bitraversable NonEmptyAlterList where
+instance bitraversableAlterListNonEmpty :: Bitraversable AlterListNonEmpty where
   bitraverse g f = case _ of
     One a -> map One (f a)
     Alter a list -> ado
@@ -57,13 +57,13 @@ instance bitraversableNonEmptyAlterList :: Bitraversable NonEmptyAlterList where
   bisequence x = bisequenceDefault x
 
 -- | Adds an element to the front of the list.
-cons :: forall a b. b -> NonEmptyAlterList b a -> NonEmptyAlterList a b
+cons :: forall a b. b -> AlterListNonEmpty b a -> AlterListNonEmpty a b
 cons b list = Alter b list
 
 -- | Adds an element to the end of the list. Since we don't know whether
 -- | the list will end with an `a` type (invalid `snoc`) or a `b` type
 -- | (valid `snoc`), the list is wrapped in a `Maybe`
-snoc :: forall a b. a -> NonEmptyAlterList b a -> Maybe (NonEmptyAlterList b a)
+snoc :: forall a b. a -> AlterListNonEmpty b a -> Maybe (AlterListNonEmpty b a)
 snoc newA = case _ of
   One originalA -> Nothing
   Alter originalA listB -> case listB of
@@ -74,7 +74,7 @@ snoc newA = case _ of
 
 -- | Adds an element to the end of the list. If the list ends with
 -- | a value of the same type as `a`, the `defaultB` value is used instead.
-snocDefault :: forall a b. a -> b -> NonEmptyAlterList b a -> NonEmptyAlterList b a
+snocDefault :: forall a b. a -> b -> AlterListNonEmpty b a -> AlterListNonEmpty b a
 snocDefault newA defaultB = case _ of
   One originalA -> Alter originalA (One defaultB)
   Alter originalA listB -> case listB of
@@ -82,26 +82,26 @@ snocDefault newA defaultB = case _ of
     Alter b listA -> Alter originalA (Alter b (snocDefault newA defaultB listA))
 
 -- | Adds an element to the end of the list when the types do not alternate.
-snoc' :: forall a. a -> NonEmptyAlterList a a -> NonEmptyAlterList a a
+snoc' :: forall a. a -> AlterListNonEmpty a a -> AlterListNonEmpty a a
 snoc' a = case _ of
   One a' -> Alter a' (One a)
   Alter a' listA -> Alter a' (snoc' a listA)
 
-splitList :: forall a b. NonEmptyAlterList b a -> Tuple (List a) (List b)
+splitList :: forall a b. AlterListNonEmpty b a -> Tuple (List a) (List b)
 splitList list =
   bifoldl (\tuple b -> rmap (Cons b) tuple) (\tuple a -> lmap (Cons a) tuple) (Tuple Nil Nil) list
 
--- | Only returns a `NonEmptyAlterList` if both Lists' size are equal
-zipList :: forall a b. List a -> List b -> Maybe (NonEmptyAlterList b a)
+-- | Only returns a `AlterListNonEmpty` if both Lists' size are equal
+zipList :: forall a b. List a -> List b -> Maybe (AlterListNonEmpty b a)
 zipList Nil _ = Nothing
 zipList _ Nil = Nothing
 zipList (Cons h1 tail1) (Cons h2 tail2) = ado
       rest <- zipList tail1 tail2
       in Alter h1 (Alter h2 rest)
 
--- | Same as `zipList` but will return a `NonEmptyAlterList` as long as
+-- | Same as `zipList` but will return a `AlterListNonEmpty` as long as
 -- | the first list has an element.
-zipList' :: forall a b. List a -> List b -> Maybe (NonEmptyAlterList b a)
+zipList' :: forall a b. List a -> List b -> Maybe (AlterListNonEmpty b a)
 zipList' Nil _ = Nothing
 zipList' (Cons h1 _) Nil = Just (One h1)
 zipList' (Cons h1 tail1) (Cons h2 tail2) = ado
