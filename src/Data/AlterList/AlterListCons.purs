@@ -66,6 +66,14 @@ instance bitraversableAlterListCons :: Bitraversable AlterListCons where
 
   bisequence x = bisequenceDefault x
 
+isSingle :: forall a b. AlterListCons b a -> Boolean
+isSingle (Single _) = true
+isSingle _ = false
+
+isDouble :: forall a b. AlterListCons b a -> Boolean
+isDouble (Double _ _ _) = true
+isDouble _ = false
+
 -- | Creates a list with only one element
 singleton :: forall a b. a -> AlterListCons b a
 singleton = Single
