@@ -95,6 +95,15 @@ splitList :: forall a b. AlterListCons b a -> Tuple (List a) (List b)
 splitList =
   bifoldl (\tuple b -> rmap (Cons b) tuple) (\tuple a -> lmap (Cons a) tuple) (Tuple Nil Nil)
 
+-- | Zips the two lists together until the one of the lists runs out of
+-- | elements.
+zipList :: forall a b. List a -> List b -> Maybe (AlterListCons b a)
+zipList Nil _ = Nothing
+zipList (Cons a _) Nil = Just (Single a)
+zipList (Cons a tail1) (Cons b tail2) = ado
+  rest <- zipList tail1 tail2
+  in Double a b rest
+
 -- | Similar to `intercalate`. The output is the reversed input list
 -- | whose `b` value is the result of applying all values in the input list
 -- | except for its first element.
