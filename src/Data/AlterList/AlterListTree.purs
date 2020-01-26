@@ -1,4 +1,4 @@
-module Data.AlterListTree.Tree.Empty where
+module Data.AlterList.AlterListTree where
 
 import Prelude
 
