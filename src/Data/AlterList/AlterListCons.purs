@@ -26,6 +26,14 @@ data AlterListCons inner outer
   = Single outer
   | Double outer inner (AlterListCons inner outer)
 
+instance semigroupAlterListCons :: Semigroup a => Semigroup (AlterListCons b a) where
+  append (Single a1) (Single a2) = Single (a1 <> a2)
+  append (Single a1) (Double a2 b treeA) = Double (a1 <> a2) b treeA
+  append (Double a1 b treeA) list = Double a1 b (treeA <> list)
+
+instance monoidAlterListCons :: Monoid a => Monoid (AlterListCons b a) where
+  mempty = Single mempty
+
 instance functorAlterListCons :: Functor (AlterListCons b) where
   map = bimap identity
 
@@ -72,12 +80,6 @@ snoc newB newA = case _ of
   Single a -> Double a newB (Single newA)
   Double a b treeA ->
     Double a b (snoc newB newA treeA)
-
--- | Closest we can get to `treeA1 <|> treeA2`
-concat :: forall a b. Semigroup a => AlterListCons b a -> AlterListCons b a -> AlterListCons b a
-concat (Single a1) (Single a2) = Single (a1 <> a2)
-concat (Single a1) (Double a2 b treeA) = Double (a1 <> a2) b treeA
-concat (Double a1 b treeA) list = Double a1 b (concat treeA list)
 
 -- | Splits the AlterListCons into a list of `a`s and `b`s. The `a` list
 -- | will always have one more element than the `b` list.
