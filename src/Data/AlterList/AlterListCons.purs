@@ -73,6 +73,12 @@ snoc newB newA = case _ of
   Double a b treeA ->
     Double a b (snoc newB newA treeA)
 
+-- | Closest we can get to `treeA1 <|> treeA2`
+concat :: forall a b. Semigroup a => AlterListCons b a -> AlterListCons b a -> AlterListCons b a
+concat (Single a1) (Single a2) = Single (a1 <> a2)
+concat (Single a1) (Double a2 b treeA) = Double (a1 <> a2) b treeA
+concat (Double a1 b treeA) list = Double a1 b (concat treeA list)
+
 -- | Splits the AlterListCons into a list of `a`s and `b`s. The `a` list
 -- | will always have one more element than the `b` list.
 splitList :: forall a b. AlterListCons b a -> Tuple (List a) (List b)
